@@ -18,11 +18,8 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    
-    // Hash of "primeplots@321"
     const TARGET_HASH = '2f38557624d0c0d0b98dca2b607aeb5b2ae2a3b18646f2478a8fcb85bc2fb474';
     const inputHash = await hashPassword(password);
-
     if (username === 'primeplots@admin' && inputHash === TARGET_HASH) {
       localStorage.setItem('admin_auth', 'true');
       navigate('/admin');
@@ -35,15 +32,15 @@ const Login = () => {
     <div className="flex items-center justify-center min-h-[70vh] px-4">
       <div className="glass-card w-full max-w-md p-8">
         <div className="text-center mb-8">
-          <div className="mx-auto w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
-            <Lock className="text-emerald-600" size={32} />
+          <div className="mx-auto w-16 h-16 bg-emerald-100 dark:bg-emerald-900/40 rounded-full flex items-center justify-center mb-4">
+            <Lock className="text-emerald-600 dark:text-emerald-400" size={32} />
           </div>
-          <h2 className="text-3xl font-bold text-slate-800">Admin Login</h2>
-          <p className="text-slate-500 mt-2">Sign in to manage properties</p>
+          <h2 className="text-3xl font-bold text-slate-800 dark:text-white">Admin Login</h2>
+          <p className="text-slate-500 dark:text-slate-400 mt-2">Sign in to manage properties</p>
         </div>
 
         {error && (
-          <div className="bg-red-100 text-red-700 p-3 rounded-lg mb-6 text-sm text-center">
+          <div className="bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 p-3 rounded-xl mb-6 text-sm text-center font-medium">
             {error}
           </div>
         )}
@@ -83,7 +80,7 @@ const Login = () => {
             </div>
           </div>
 
-          <button type="submit" className="btn btn-primary w-full shadow-lg">
+          <button type="submit" className="btn btn-primary w-full shadow-lg py-4 text-base">
             Sign In
           </button>
         </form>
