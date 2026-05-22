@@ -45,14 +45,14 @@ const Admin = () => {
         img.onload = () => {
           const canvas = document.createElement('canvas');
           let [width, height] = [img.width, img.height];
-          const MAX = 1200;
+          const MAX = 800;
           if (width > height ? width > MAX : height > MAX) {
             if (width > height) { height *= MAX / width; width = MAX; }
             else { width *= MAX / height; height = MAX; }
           }
           canvas.width = width; canvas.height = height;
           canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
           setFormData(prev => ({ ...prev, images: [...prev.images, dataUrl] }));
         };
         img.src = event.target.result;
@@ -64,15 +64,13 @@ const Admin = () => {
   const removeImage = (idx) => setFormData(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== idx) }));
 
   const uploadImagesToFirebase = async (imagesArray) => {
-    const urls = [];
-    for (let i = 0; i < imagesArray.length; i++) {
-      const img = imagesArray[i];
-      if (img.startsWith('http')) { urls.push(img); continue; }
-      const imageRef = ref(storage, `properties/${Date.now()}_${i}.jpg`);
+    const uploadPromises = imagesArray.map(async (img, i) => {
+      if (img.startsWith('http')) return img;
+      const imageRef = ref(storage, `properties/${Date.now()}_${Math.floor(Math.random() * 10000)}_${i}.jpg`);
       await uploadString(imageRef, img, 'data_url');
-      urls.push(await getDownloadURL(imageRef));
-    }
-    return urls;
+      return await getDownloadURL(imageRef);
+    });
+    return await Promise.all(uploadPromises);
   };
 
   const handleSubmit = async (e) => {
