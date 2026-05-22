@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { MessageCircle, MapPin, Maximize, Home as HomeIcon, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import Loader from '../components/Loader';
-import { db } from '../firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import { supabase } from '../supabase';
 
 const Home = () => {
   const [properties, setProperties] = useState([]);
@@ -15,10 +14,9 @@ const Home = () => {
 
     const fetchProperties = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "properties"));
-        const props = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        props.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
-        setProperties(props);
+        const { data, error } = await supabase.from('properties').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        setProperties(data || []);
       } catch (error) {
         console.error("Error fetching properties:", error);
       }

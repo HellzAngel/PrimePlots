@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { PlusCircle, Image as ImageIcon, Loader, Edit2, Trash2, LogOut, ArrowLeft, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { db, storage } from '../firebase';
-import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { ref, uploadString, getDownloadURL } from 'firebase/storage';
+import { supabase } from '../supabase';
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -22,13 +20,12 @@ const Admin = () => {
 
   const loadProperties = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, "properties"));
-      const props = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      props.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
-      setProperties(props);
+      const { data, error } = await supabase.from('properties').select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      setProperties(data || []);
     } catch (error) {
       console.error("Error fetching properties:", error);
-      alert("Failed to load properties. Ensure Firestore is set up correctly.");
+      alert("Failed to load properties. Ensure Supabase is set up correctly.");
     } finally { setFetching(false); }
   };
 
@@ -63,12 +60,16 @@ const Admin = () => {
 
   const removeImage = (idx) => setFormData(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== idx) }));
 
-  const uploadImagesToFirebase = async (imagesArray) => {
+  const uploadImagesToSupabase = async (imagesArray) => {
     const uploadPromises = imagesArray.map(async (img, i) => {
       if (img.startsWith('http')) return img;
-      const imageRef = ref(storage, `properties/${Date.now()}_${Math.floor(Math.random() * 10000)}_${i}.jpg`);
-      await uploadString(imageRef, img, 'data_url');
-      return await getDownloadURL(imageRef);
+      const res = await fetch(img);
+      const blob = await res.blob();
+      const fileName = `${Date.now()}_${Math.floor(Math.random() * 10000)}_${i}.jpg`;
+      const { data, error } = await supabase.storage.from('properties').upload(fileName, blob, { contentType: 'image/jpeg' });
+      if (error) throw error;
+      const { data: publicUrlData } = supabase.storage.from('properties').getPublicUrl(data.path);
+      return publicUrlData.publicUrl;
     });
     return await Promise.all(uploadPromises);
   };
@@ -78,12 +79,14 @@ const Admin = () => {
     if (formData.images.length === 0) { alert('Please upload at least 1 image.'); return; }
     setLoading(true);
     try {
-      const finalImageUrls = await uploadImagesToFirebase(formData.images);
-      const propertyData = { ...formData, images: finalImageUrls, updatedAt: serverTimestamp() };
+      const finalImageUrls = await uploadImagesToSupabase(formData.images);
+      const propertyData = { ...formData, images: finalImageUrls };
       if (editingId) {
-        await updateDoc(doc(db, "properties", editingId), propertyData);
+        const { error } = await supabase.from('properties').update(propertyData).eq('id', editingId);
+        if (error) throw error;
       } else {
-        await addDoc(collection(db, "properties"), { ...propertyData, createdAt: serverTimestamp() });
+        const { error } = await supabase.from('properties').insert([propertyData]);
+        if (error) throw error;
       }
       await loadProperties();
       setView('list');
@@ -102,7 +105,8 @@ const Admin = () => {
   const confirmDelete = async () => {
     if (!deleteModalId) return;
     try {
-      await deleteDoc(doc(db, "properties", deleteModalId));
+      const { error } = await supabase.from('properties').delete().eq('id', deleteModalId);
+      if (error) throw error;
       setProperties(properties.filter(p => p.id !== deleteModalId));
     } catch (err) { alert("Failed to delete."); }
     finally { setDeleteModalId(null); }
