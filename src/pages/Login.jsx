@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, User } from 'lucide-react';
 
@@ -7,6 +7,12 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (localStorage.getItem('admin_auth') === 'true') {
+      navigate('/admin', { replace: true });
+    }
+  }, [navigate]);
 
   const hashPassword = async (pwd) => {
     const encoder = new TextEncoder();
@@ -22,7 +28,7 @@ const Login = () => {
     const inputHash = await hashPassword(password);
     if (username === 'primeplots@admin' && inputHash === TARGET_HASH) {
       localStorage.setItem('admin_auth', 'true');
-      navigate('/admin');
+      navigate('/admin', { replace: true });
     } else {
       setError('Invalid username or password');
     }
