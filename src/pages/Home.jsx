@@ -7,11 +7,24 @@ const Home = () => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedProp, setSelectedProp] = useState(null);
+  const [isClosing, setIsClosing] = useState(false);
   const [currentImageIdx, setCurrentImageIdx] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const closeModal = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setSelectedProp(null);
+      setIsClosing(false);
+    }, 280);
+  };
+
+  const closeLightbox = () => {
+    setIsLightboxOpen(false);
+  };
 
   const filteredProperties = properties.filter(prop => 
     prop.location?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -223,10 +236,23 @@ Link: ${window.location.origin}/?property=${prop.id}`;
 
       {/* Full Details Pop-up Modal */}
       {selectedProp && (
-        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-slate-900/60 backdrop-blur-md animate-fade-in" onClick={() => setSelectedProp(null)}>
-          <div className="bg-white dark:bg-slate-800 w-full sm:max-w-5xl sm:mx-4 rounded-t-[2rem] sm:rounded-[2rem] max-h-[92vh] overflow-y-auto shadow-2xl animate-fade-in-up flex flex-col md:flex-row relative" onClick={e => e.stopPropagation()}>
+        <div 
+          className={`fixed inset-0 z-[100] flex items-end sm:items-center justify-center ${isClosing ? 'animate-fade-out' : 'animate-fade-in'}`}
+          style={{ backgroundColor: isClosing ? undefined : undefined }}
+          onClick={closeModal}
+        >
+          {/* Backdrop */}
+          <div className={`absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity duration-300 ${isClosing ? 'opacity-0' : 'opacity-100'}`} />
+
+          <div 
+            className={`relative bg-white dark:bg-slate-800 w-full sm:max-w-5xl sm:mx-4 rounded-t-[2rem] sm:rounded-[2rem] max-h-[92vh] overflow-y-auto shadow-2xl flex flex-col md:flex-row z-10
+              ${isClosing 
+                ? 'sm:animate-scale-out animate-fade-out-down' 
+                : 'sm:animate-scale-in animate-fade-in-up'}`}
+            onClick={e => e.stopPropagation()}
+          >
             
-            <button onClick={() => setSelectedProp(null)} className="absolute top-4 right-4 z-10 bg-white/80 dark:bg-slate-700/80 backdrop-blur-sm text-slate-800 dark:text-white p-2 rounded-full hover:bg-white dark:hover:bg-slate-600 hover:scale-110 hover:text-rose-500 transition-all shadow-md">
+            <button onClick={closeModal} className="absolute top-4 right-4 z-10 bg-white/80 dark:bg-slate-700/80 backdrop-blur-sm text-slate-800 dark:text-white p-2 rounded-full hover:bg-white dark:hover:bg-slate-600 hover:scale-110 hover:text-rose-500 transition-all shadow-md">
               <X size={24} />
             </button>
 
@@ -310,12 +336,12 @@ Link: ${window.location.origin}/?property=${prop.id}`;
       {/* Fullscreen Lightbox Modal */}
       {isLightboxOpen && selectedProp && getImages(selectedProp).length > 0 && (
         <div 
-          className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-slate-955/95 backdrop-blur-md animate-fade-in"
-          onClick={() => setIsLightboxOpen(false)}
+          className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/90 backdrop-blur-md animate-fade-in"
+          onClick={closeLightbox}
         >
           {/* Close button */}
           <button 
-            onClick={() => setIsLightboxOpen(false)} 
+            onClick={closeLightbox} 
             className="absolute top-6 right-6 z-50 bg-white/10 text-white p-3 rounded-full hover:bg-white/20 hover:scale-110 transition-all shadow-lg"
           >
             <X size={28} />
