@@ -64,7 +64,7 @@ const Home = () => {
   return (
     <div className="container max-w-7xl mx-auto px-4 pb-12 mt-4 md:mt-8">
       <div className="text-center mb-16 animate-fade-in-up">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-slate-800 dark:text-white mb-4 tracking-tight">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-teal-400 to-emerald-600 dark:from-emerald-400 dark:via-teal-200 dark:to-emerald-400 bg-[length:200%_auto] animate-text-shimmer mb-4 tracking-tight">
           Find Your Dream Property
         </h1>
         <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
