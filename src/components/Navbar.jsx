@@ -9,11 +9,11 @@ const Navbar = () => {
   return (
     <div className="pt-4 px-4 container max-w-7xl mx-auto z-50 relative">
       <nav className="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm rounded-full px-4 sm:px-6 py-3 flex flex-row justify-between items-center gap-2 transition-colors duration-300">
-        <Link to="/" className="text-xl sm:text-2xl font-black flex items-center gap-2 transition-colors shrink-0 group">
-          <div className="bg-emerald-600 p-2 rounded-full group-hover:scale-110 transition-transform">
-            <Home size={18} className="text-white sm:w-[20px] sm:h-[20px]" />
+        <Link to="/" className="text-lg sm:text-2xl font-black flex items-center gap-1.5 sm:gap-2 transition-colors shrink-0 group">
+          <div className="bg-emerald-600 p-1.5 sm:p-2 rounded-full group-hover:scale-110 transition-transform">
+            <Home size={16} className="text-white sm:w-[20px] sm:h-[20px]" />
           </div>
-          <span className="tracking-tight hidden sm:block text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-teal-400 to-emerald-600 dark:from-emerald-400 dark:via-teal-200 dark:to-emerald-400 bg-[length:200%_auto] animate-text-shimmer">PrimePlots</span>
+          <span className="tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-teal-400 to-emerald-600 dark:from-emerald-400 dark:via-teal-200 dark:to-emerald-400 bg-[length:200%_auto] animate-text-shimmer">PrimePlots</span>
         </Link>
 
         <div className="flex items-center gap-1.5 sm:gap-4 shrink-0">
