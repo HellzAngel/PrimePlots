@@ -70,6 +70,11 @@ const Home = () => {
         <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
           Browse our exclusive collection of premium real estate, carefully curated for your ultimate lifestyle.
         </p>
+        <div className="flex justify-center mt-8">
+          <a href="https://wa.me/917560953886?text=Hi!%20I%20would%20like%20to%20share%20details%20of%20my%20property%20to%20be%20listed%20on%20PrimePlots." target="_blank" rel="noopener noreferrer" className="btn btn-whatsapp py-3 px-6 sm:px-8 text-base sm:text-lg shadow-lg hover:scale-105 transition-transform flex items-center gap-2">
+            <MessageCircle size={24} /> List Your Property via WhatsApp
+          </a>
+        </div>
       </div>
 
       {properties.length === 0 ? (
