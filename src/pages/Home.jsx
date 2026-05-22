@@ -82,15 +82,17 @@ const Home = () => {
     } else {
       setIsLightboxOpen(false);
       document.body.style.overflow = 'auto';
-      // Remove property ID from URL query parameter
-      const url = new URL(window.location.href);
-      if (url.searchParams.has('property')) {
-        url.searchParams.delete('property');
-        window.history.replaceState(null, '', url.toString());
+      // Remove property ID from URL query parameter only after initial loading is complete
+      if (!loading) {
+        const url = new URL(window.location.href);
+        if (url.searchParams.has('property')) {
+          url.searchParams.delete('property');
+          window.history.replaceState(null, '', url.toString());
+        }
       }
     }
     return () => { document.body.style.overflow = 'auto'; };
-  }, [selectedProp]);
+  }, [selectedProp, loading]);
 
   const getWhatsAppLink = (prop) => {
     if (!prop) return '';
