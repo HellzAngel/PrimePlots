@@ -89,7 +89,7 @@ const Admin = () => {
       setView('list');
     } catch (err) {
       console.error(err);
-      alert('Failed to save. Check Firebase configuration.');
+      alert('Failed to save: ' + (err.message || 'Unknown error'));
     } finally { setLoading(false); }
   };
 
