@@ -8,6 +8,35 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [selectedProp, setSelectedProp] = useState(null);
   const [currentImageIdx, setCurrentImageIdx] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    if (isLeftSwipe) {
+      const images = getImages(selectedProp);
+      setCurrentImageIdx((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+    }
+    if (isRightSwipe) {
+      const images = getImages(selectedProp);
+      setCurrentImageIdx((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+    }
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 4000);
@@ -29,8 +58,10 @@ const Home = () => {
   useEffect(() => {
     if (selectedProp) {
       setCurrentImageIdx(0);
+      setIsLightboxOpen(false);
       document.body.style.overflow = 'hidden';
     } else {
+      setIsLightboxOpen(false);
       document.body.style.overflow = 'auto';
     }
     return () => { document.body.style.overflow = 'auto'; };
@@ -130,10 +161,22 @@ const Home = () => {
             </button>
 
             {/* Image Gallery */}
-            <div className="md:w-1/2 relative bg-slate-100 dark:bg-slate-700 flex-shrink-0 h-56 sm:h-72 md:h-auto">
+            <div 
+              className="md:w-1/2 relative bg-slate-100 dark:bg-slate-700 flex-shrink-0 h-56 sm:h-72 md:h-auto cursor-zoom-in group/gallery"
+              onClick={() => setIsLightboxOpen(true)}
+              onTouchStart={onTouchStart}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onTouchEnd}
+            >
               {getImages(selectedProp).length > 0 ? (
                 <>
-                  <img src={getImages(selectedProp)[currentImageIdx]} alt={selectedProp.title} className="w-full h-full object-cover" />
+                  <img src={getImages(selectedProp)[currentImageIdx]} alt={selectedProp.title} className="w-full h-full object-cover transition-opacity duration-300 hover:opacity-90" />
+                  
+                  {/* Zoom Indicator Icon */}
+                  <div className="absolute top-4 left-4 z-10 bg-slate-900/60 backdrop-blur-sm text-white p-2 rounded-full hover:bg-slate-900 transition-all shadow-md">
+                    <Maximize size={18} />
+                  </div>
+
                   {getImages(selectedProp).length > 1 && (
                     <>
                       <div className="absolute inset-y-0 left-0 flex items-center pl-2">
@@ -155,7 +198,7 @@ const Home = () => {
                   )}
                 </>
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-slate-400"><HomeIcon size={64} /></div>
+                <div className="w-full h-full flex items-center justify-center text-slate-400" onClick={e => e.stopPropagation()}><HomeIcon size={64} /></div>
               )}
             </div>
 
@@ -190,6 +233,67 @@ const Home = () => {
                 <MessageCircle size={24} /> Contact Owner on WhatsApp
               </a>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Fullscreen Lightbox Modal */}
+      {isLightboxOpen && selectedProp && getImages(selectedProp).length > 0 && (
+        <div 
+          className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-slate-955/95 backdrop-blur-md animate-fade-in"
+          onClick={() => setIsLightboxOpen(false)}
+        >
+          {/* Close button */}
+          <button 
+            onClick={() => setIsLightboxOpen(false)} 
+            className="absolute top-6 right-6 z-50 bg-white/10 text-white p-3 rounded-full hover:bg-white/20 hover:scale-110 transition-all shadow-lg"
+          >
+            <X size={28} />
+          </button>
+
+          {/* Image container */}
+          <div 
+            className="relative w-full max-w-5xl px-4 flex items-center justify-center select-none" 
+            onClick={e => e.stopPropagation()}
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+          >
+            <img 
+              src={getImages(selectedProp)[currentImageIdx]} 
+              alt={selectedProp.title} 
+              className="max-w-full max-h-[80vh] object-contain rounded-2xl shadow-2xl transition-all duration-300"
+            />
+
+            {/* Navigation Arrows in Lightbox */}
+            {getImages(selectedProp).length > 1 && (
+              <>
+                <button 
+                  onClick={prevImage} 
+                  className="absolute left-6 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full shadow-lg transition-all hidden sm:block"
+                >
+                  <ChevronLeft size={32} />
+                </button>
+                <button 
+                  onClick={nextImage} 
+                  className="absolute right-6 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full shadow-lg transition-all hidden sm:block"
+                >
+                  <ChevronRight size={32} />
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Bottom Info Bar */}
+          <div className="mt-6 flex flex-col items-center gap-2 text-center px-4" onClick={e => e.stopPropagation()}>
+            <span className="text-white font-semibold text-lg">{selectedProp.title}</span>
+            {getImages(selectedProp).length > 1 && (
+              <span className="text-slate-400 font-medium text-sm">
+                {currentImageIdx + 1} of {getImages(selectedProp).length}
+              </span>
+            )}
+            {/* Mobile swipe helper */}
+            <span className="text-slate-500 text-xs sm:hidden mt-1">Swipe left/right to navigate</span>
           </div>
         </div>
       )}
