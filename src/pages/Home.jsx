@@ -122,15 +122,15 @@ const Home = () => {
 
       {/* Full Details Pop-up Modal */}
       {selectedProp && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4 animate-fade-in" onClick={() => setSelectedProp(null)}>
-          <div className="bg-white dark:bg-slate-800 rounded-[2rem] max-w-5xl w-full max-h-[90vh] overflow-hidden shadow-2xl animate-fade-in-up flex flex-col md:flex-row relative" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-slate-900/60 backdrop-blur-md animate-fade-in" onClick={() => setSelectedProp(null)}>
+          <div className="bg-white dark:bg-slate-800 w-full sm:max-w-5xl sm:mx-4 rounded-t-[2rem] sm:rounded-[2rem] max-h-[92vh] overflow-y-auto shadow-2xl animate-fade-in-up flex flex-col md:flex-row relative" onClick={e => e.stopPropagation()}>
             
             <button onClick={() => setSelectedProp(null)} className="absolute top-4 right-4 z-10 bg-white/80 dark:bg-slate-700/80 backdrop-blur-sm text-slate-800 dark:text-white p-2 rounded-full hover:bg-white dark:hover:bg-slate-600 hover:scale-110 hover:text-rose-500 transition-all shadow-md">
               <X size={24} />
             </button>
 
             {/* Image Gallery */}
-            <div className="md:w-1/2 relative bg-slate-100 dark:bg-slate-700 flex flex-col h-64 md:h-auto">
+            <div className="md:w-1/2 relative bg-slate-100 dark:bg-slate-700 flex-shrink-0 h-56 sm:h-72 md:h-auto">
               {getImages(selectedProp).length > 0 ? (
                 <>
                   <img src={getImages(selectedProp)[currentImageIdx]} alt={selectedProp.title} className="w-full h-full object-cover" />
@@ -160,9 +160,9 @@ const Home = () => {
             </div>
 
             {/* Details */}
-            <div className="md:w-1/2 p-8 md:p-10 flex flex-col overflow-y-auto">
-              <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white mb-2">{selectedProp.title}</h2>
-              <div className="text-3xl font-black text-emerald-600 dark:text-emerald-400 mb-6">₹{selectedProp.price}</div>
+            <div className="md:w-1/2 p-6 sm:p-8 md:p-10 flex flex-col">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white mb-2">{selectedProp.title}</h2>
+              <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 mb-4 sm:mb-6">₹{selectedProp.price}</div>
 
               <div className="flex flex-col gap-4 mb-8">
                 <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-2xl border border-slate-100 dark:border-slate-600">
