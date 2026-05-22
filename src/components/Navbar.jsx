@@ -8,9 +8,9 @@ const Navbar = () => {
 
   return (
     <div className="pt-4 px-4 container max-w-7xl mx-auto z-50 relative">
-      <nav className="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm rounded-full px-6 py-3 flex justify-between items-center transition-colors duration-300">
-        <Link to="/" className="text-2xl font-black text-slate-800 dark:text-white flex items-center gap-2 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-          <div className="bg-emerald-600 p-2 rounded-full">
+      <nav className="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl sm:rounded-full px-4 sm:px-6 py-3 flex flex-wrap justify-between items-center gap-3 transition-colors duration-300">
+        <Link to="/" className="text-xl sm:text-2xl font-black text-slate-800 dark:text-white flex items-center gap-2 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+          <div className="bg-emerald-600 p-1.5 sm:p-2 rounded-full">
             <Home size={20} className="text-white" />
           </div>
           <span className="tracking-tight">PrimePlots</span>
