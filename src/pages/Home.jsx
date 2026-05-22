@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { MessageCircle, MapPin, Maximize, Home as HomeIcon, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { MessageCircle, MapPin, Maximize, Home as HomeIcon, X, ChevronLeft, ChevronRight, Search } from 'lucide-react';
 import Loader from '../components/Loader';
 import { supabase } from '../supabase';
 
@@ -11,6 +11,11 @@ const Home = () => {
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredProperties = properties.filter(prop => 
+    prop.location?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const minSwipeDistance = 50;
 
@@ -92,7 +97,7 @@ const Home = () => {
 
   return (
     <div className="container max-w-7xl mx-auto px-4 pb-12 mt-4 md:mt-8">
-      <div className="text-center mb-16 animate-fade-in-up">
+      <div className="text-center mb-10 animate-fade-in-up">
         <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-teal-400 to-emerald-600 dark:from-emerald-400 dark:via-teal-200 dark:to-emerald-400 bg-[length:200%_auto] animate-text-shimmer mb-4 tracking-tight">
           Find Your Dream Property
         </h1>
@@ -106,15 +111,49 @@ const Home = () => {
         </div>
       </div>
 
+      {properties.length > 0 && (
+        <div className="max-w-xl mx-auto mb-12 animate-fade-in px-2">
+          <div className="relative flex items-center bg-white dark:bg-slate-800 rounded-full border border-slate-200 dark:border-slate-700 shadow-md px-4 py-1.5 focus-within:ring-4 focus-within:ring-emerald-500/10 focus-within:border-emerald-500 transition-all duration-300">
+            <div className="text-slate-400 dark:text-slate-500 pl-2">
+              <Search size={20} />
+            </div>
+            <input 
+              type="text" 
+              placeholder="Search by location (e.g. Kochi, Calicut)..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-transparent border-0 px-3 py-2.5 text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-0 outline-none text-base font-medium"
+            />
+            {searchQuery && (
+              <button 
+                onClick={() => setSearchQuery('')}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-2 mr-1 transition-colors"
+              >
+                <X size={18} />
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       {properties.length === 0 ? (
         <div className="glass-card text-center py-20 px-4 max-w-2xl mx-auto animate-fade-in">
           <HomeIcon size={64} className="text-emerald-200 dark:text-emerald-800 mx-auto mb-4" />
           <h2 className="text-3xl font-bold text-slate-700 dark:text-slate-200 mb-2">No properties available yet</h2>
           <p className="text-slate-500 dark:text-slate-400 text-lg">We are currently updating our catalog. Please check back soon!</p>
         </div>
+      ) : filteredProperties.length === 0 ? (
+        <div className="glass-card text-center py-16 px-4 max-w-md mx-auto animate-fade-in">
+          <MapPin size={48} className="text-slate-300 dark:text-slate-600 mx-auto mb-4" />
+          <h3 className="text-2xl font-bold text-slate-700 dark:text-slate-200 mb-2">No listings in "{searchQuery}"</h3>
+          <p className="text-slate-500 dark:text-slate-400 mb-6">Try searching for another location or check your spelling.</p>
+          <button onClick={() => setSearchQuery('')} className="btn bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 font-semibold py-2 px-6">
+            Clear Search
+          </button>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {properties.map((prop, index) => {
+          {filteredProperties.map((prop, index) => {
             const images = getImages(prop);
             return (
               <div key={prop.id} className="glass-card group cursor-pointer" style={{ animationDelay: `${index * 50}ms` }} onClick={() => setSelectedProp(prop)}>
