@@ -51,6 +51,16 @@ const Home = () => {
         const { data, error } = await supabase.from('properties').select('*').order('created_at', { ascending: false });
         if (error) throw error;
         setProperties(data || []);
+
+        // Auto-select property from URL parameter if present
+        const params = new URLSearchParams(window.location.search);
+        const propId = params.get('property');
+        if (propId && data) {
+          const found = data.find(p => String(p.id) === String(propId));
+          if (found) {
+            setSelectedProp(found);
+          }
+        }
       } catch (error) {
         console.error("Error fetching properties:", error);
       }
@@ -65,9 +75,19 @@ const Home = () => {
       setCurrentImageIdx(0);
       setIsLightboxOpen(false);
       document.body.style.overflow = 'hidden';
+      // Sync property ID to URL query parameter
+      const url = new URL(window.location.href);
+      url.searchParams.set('property', selectedProp.id);
+      window.history.replaceState(null, '', url.toString());
     } else {
       setIsLightboxOpen(false);
       document.body.style.overflow = 'auto';
+      // Remove property ID from URL query parameter
+      const url = new URL(window.location.href);
+      if (url.searchParams.has('property')) {
+        url.searchParams.delete('property');
+        window.history.replaceState(null, '', url.toString());
+      }
     }
     return () => { document.body.style.overflow = 'auto'; };
   }, [selectedProp]);
@@ -82,7 +102,7 @@ const Home = () => {
 📐 *Area:* ${prop.area}
 
 Could you please provide more details?
-Website: ${window.location.origin}`;
+Link: ${window.location.origin}/?property=${prop.id}`;
     return `https://wa.me/917560953886?text=${encodeURIComponent(message)}`;
   };
 
