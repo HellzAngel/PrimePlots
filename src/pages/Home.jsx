@@ -72,8 +72,17 @@ const Home = () => {
     return () => { document.body.style.overflow = 'auto'; };
   }, [selectedProp]);
 
-  const getWhatsAppLink = (title) => {
-    const message = `Hi, I'm interested in the property: ${title}. Could you provide more details?`;
+  const getWhatsAppLink = (prop) => {
+    if (!prop) return '';
+    const message = `Hi, I'm interested in the following property listed on PrimePlots:
+
+🏠 *${prop.title}*
+💰 *Price:* ₹${prop.price}
+📍 *Location:* ${prop.location}
+📐 *Area:* ${prop.area}
+
+Could you please provide more details?
+Website: ${window.location.origin}`;
     return `https://wa.me/917560953886?text=${encodeURIComponent(message)}`;
   };
 
@@ -268,7 +277,7 @@ const Home = () => {
                 <p className="text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">{selectedProp.description}</p>
               </div>
 
-              <a href={getWhatsAppLink(selectedProp.title)} target="_blank" rel="noopener noreferrer" className="btn btn-whatsapp w-full py-4 text-lg mt-auto shadow-xl">
+              <a href={getWhatsAppLink(selectedProp)} target="_blank" rel="noopener noreferrer" className="btn btn-whatsapp w-full py-4 text-lg mt-auto shadow-xl">
                 <MessageCircle size={24} /> Contact Owner on WhatsApp
               </a>
             </div>
